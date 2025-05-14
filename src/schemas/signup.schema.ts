@@ -19,7 +19,7 @@ export const SignUpSchema = z
       .email('El correo ingresado no es válido'),
     password: passwordSchema,
     confirmPassword: z.string({
-      required_error: 'Debe confirmar  su contraseña'
+      required_error: 'Debe confirmar su contraseña'
     })
   })
   .refine(data => data.password === data.confirmPassword, {

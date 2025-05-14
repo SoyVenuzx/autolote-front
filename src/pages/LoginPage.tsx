@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 
@@ -37,8 +37,7 @@ export default function LoginPage () {
   const onSubmit = async (data: LogInType) => {
     console.log('Datos de Login', data)
     await login(data)
-    console.log('Error', error)
-    // Simulate login - in a real app, you would validate credentials
+
     navigate('/dashboard')
   }
 

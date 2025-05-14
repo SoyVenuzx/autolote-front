@@ -7,6 +7,9 @@ import type {
 } from '@/types/auth.types'
 import type { UserSliceType } from '../types/user.types'
 import { api } from '@/api/axios'
+import toast from 'react-hot-toast'
+import type { CreateUserType } from '@/schemas/createUser.schema'
+import type { TableUser } from '@/types/users.type'
 
 export const createUserSlice: StateCreator<UserSliceType> = (set, get) => {
   // Verificar autenticación al inicializar
@@ -76,6 +79,7 @@ export const createUserSlice: StateCreator<UserSliceType> = (set, get) => {
 
   return {
     // Estado
+    users: [],
     user: null,
     isAuthenticated: false,
     isLoading: true,
@@ -88,6 +92,8 @@ export const createUserSlice: StateCreator<UserSliceType> = (set, get) => {
       try {
         const { user } = await authApi.login(credentials)
 
+        toast.success('Inicio de sesión exitoso')
+
         set({
           isLoading: false,
           isAuthenticated: true,
@@ -98,6 +104,7 @@ export const createUserSlice: StateCreator<UserSliceType> = (set, get) => {
         const errorMessage =
           error.response?.data?.message || 'Error al iniciar sesión'
 
+        toast.error(errorMessage)
         set({
           isLoading: false,
           isAuthenticated: false,
@@ -120,9 +127,13 @@ export const createUserSlice: StateCreator<UserSliceType> = (set, get) => {
         // Después del registro, hacemos login automáticamente
         const { login } = get()
         await login({ email: data.email, password: data.password })
+
+        toast.success('Registro exitoso')
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message || 'Error al registrarse'
+
+        toast.error(errorMessage)
 
         set({
           isLoading: false,
@@ -199,6 +210,104 @@ export const createUserSlice: StateCreator<UserSliceType> = (set, get) => {
 
       return cookies
     },
-    checkAuth: checkAuthStatus()
+
+    checkAuth: checkAuthStatus(),
+
+    getUsers: async () => {
+      try {
+        const { data } = await api.get('/admin/get-users')
+
+        set({ users: data?.data })
+      } catch (error) {
+        console.error('Error al obtener usuarios:', error)
+        toast.error('Error al obtener usuarios')
+      }
+    },
+
+    getUserById: async (userId: string) => {
+      try {
+        if (!userId) return
+
+        const { data } = await api.get(`/admin/get-user/${userId}`)
+        console.log('Usuario obtenido:', data)
+
+        return data?.user
+      } catch (error) {
+        console.error('Error al obtener usuario:', error)
+        toast.error('Error al obtener usuario')
+      }
+    },
+
+    createUser: async (formData: CreateUserType) => {
+      set({ isLoading: true, error: null })
+      try {
+        const { data } = await api.post<{ message: string; data: TableUser[] }>(
+          '/admin/create-user',
+          formData
+        )
+
+        set({ isLoading: false, users: data?.data })
+        toast.success('Registro exitoso')
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || 'Error al registrarse'
+
+        toast.error(errorMessage)
+
+        set({
+          isLoading: false,
+          error: errorMessage
+        })
+
+        throw error
+      }
+    },
+
+    deleteUser: async (userId: string) => {
+      try {
+        set({ isLoading: true, error: null })
+
+        const { data } = await api.delete(`/admin/delete-user/${userId}`)
+
+        set({ isLoading: false, users: data?.data })
+        toast.success('Usuario eliminado exitosamente')
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || 'Error al eliminar usuario'
+
+        toast.error(errorMessage)
+
+        set({
+          isLoading: false,
+          error: errorMessage
+        })
+
+        throw error
+      }
+    },
+    updateUser: async (userId: string, dataForm: CreateUserType) => {
+      set({ isLoading: true, error: null })
+      try {
+        const { data } = await api.put<{ message: string; data: TableUser[] }>(
+          `/admin/update-user/${userId}`,
+          dataForm
+        )
+
+        set({ isLoading: false, users: data?.data })
+        toast.success('Usuario actualizado exitosamente')
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || 'Error al actualizar usuario'
+
+        toast.error(errorMessage)
+
+        set({
+          isLoading: false,
+          error: errorMessage
+        })
+
+        throw error
+      }
+    }
   }
 }

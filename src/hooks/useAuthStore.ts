@@ -13,6 +13,14 @@ export const useAuthStore = () => {
   const error = Store(state => state.error)
   const checkCookies = Store(state => state.checkCookies)
   const checkAuth = Store(state => state.checkAuth)
+  const usersList = Store(state => state.users)
+
+  const getUsers = Store(state => state.getUsers)
+  const getUserById = Store(state => state.getUserById)
+
+  const createUser = Store(state => state.createUser)
+  const deleteUser = Store(state => state.deleteUser)
+  const updateUser = Store(state => state.updateUser)
 
   return {
     user,
@@ -26,6 +34,14 @@ export const useAuthStore = () => {
     clearError,
     error,
     checkCookies,
-    checkAuth
+    checkAuth,
+    usersList,
+
+    getUsers,
+    getUserById,
+
+    createUser,
+    deleteUser,
+    updateUser
   }
 }
