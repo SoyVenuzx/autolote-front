@@ -15,8 +15,7 @@ export function AppSidebar () {
     {
       title: 'Clientes',
       icon: Users,
-      href: '/dashboard/clients',
-      roles: ['ROLE_ADMIN']
+      href: '/dashboard/clients'
     },
     {
       title: 'Vehículos',

@@ -8,7 +8,10 @@ import type {
 import type { UserSliceType } from '../types/user.types'
 import { api } from '@/api/axios'
 import toast from 'react-hot-toast'
-import type { CreateUserType } from '@/schemas/createUser.schema'
+import type {
+  CreateUserType,
+  UpdateUserType
+} from '@/schemas/createUser.schema'
 import type { TableUser } from '@/types/users.type'
 
 export const createUserSlice: StateCreator<UserSliceType> = (set, get) => {
@@ -285,7 +288,7 @@ export const createUserSlice: StateCreator<UserSliceType> = (set, get) => {
         throw error
       }
     },
-    updateUser: async (userId: string, dataForm: CreateUserType) => {
+    updateUser: async (userId: string, dataForm: UpdateUserType) => {
       set({ isLoading: true, error: null })
       try {
         const { data } = await api.put<{ message: string; data: TableUser[] }>(

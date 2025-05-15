@@ -1,12 +1,23 @@
+import EmployeesTable from '@/components/Employees/EmployeesTable'
+import { useEmployeeStore } from '@/hooks/useEmployeeStore'
+import { useEffect } from 'react'
+
 export default function EmpleadosPage () {
-  return (
-    <div className='px-4 py-6 sm:px-6 lg:px-8'>
-      <h1 className='mb-6 text-2xl font-bold'>Gestión de Empleados</h1>
-      <div className='p-6 bg-white border border-gray-200 rounded-lg'>
-        <p className='text-gray-500'>
-          Aquí irá el contenido de la página de empleados.
-        </p>
-      </div>
-    </div>
-  )
+  const { getEmployees, getContactos, getPuestos } = useEmployeeStore()
+
+  useEffect(() => {
+    async function fetchUsers () {
+      try {
+        await getEmployees()
+        await getContactos()
+        await getPuestos()
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+
+    fetchUsers()
+  }, [getEmployees, getPuestos, getContactos])
+
+  return <EmployeesTable />
 }

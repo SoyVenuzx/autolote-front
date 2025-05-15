@@ -1,45 +1,38 @@
-import {
-  PlusCircle,
-  Pencil,
-  Trash2,
-  Mail,
-  Calendar,
-  Shield
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { useEmployeeStore } from '@/hooks/useEmployeeStore'
+import { Button } from '../ui/button'
+import { Calendar, Mail, Pencil, PlusCircle, Trash2 } from 'lucide-react'
 import { capitalizeString, formatDate } from '@/lib/utils'
-import { useAuthStore } from '@/hooks/useAuthStore'
+import { Badge } from '../ui/badge'
+import { CreateEmpleadoModal } from './Modals/CreateEmployeeModal'
 import { useState } from 'react'
-import { CreateUserModal } from './Modals/CreateUserModal'
-import { DeleteUserModal } from './Modals/DeleteUserModal'
+import { DeleteEmployeeModal } from './Modals/DeleteEmployeeModal'
 
-export default function UsersTable () {
-  const { usersList } = useAuthStore()
+export default function EmployeesTable () {
+  const { employees } = useEmployeeStore()
 
   const [openCreateModal, setOpenCreateModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [actualUserId, setActualUserId] = useState<number | null>(null)
 
-  const [actualUserId, setActualUserId] = useState<string | null>(null)
-
-  if (!usersList) {
-    console.log('No hay usuarios disponibles', usersList)
+  if (!employees) {
+    console.log('No hay empleados disponibles', employees)
     return null
   }
 
   const handleOpenChange = (open: boolean) => {
     if (actualUserId) setActualUserId(null)
+
     setOpenCreateModal(open)
   }
 
-  const handleDeleteUser = (userId: string) => {
-    setActualUserId(userId)
-    setOpenDeleteModal(true)
-  }
-
-  const handleUpdateUser = (userId: string) => {
+  const handleUpdateUser = (userId: number | null) => {
     setActualUserId(userId)
     setOpenCreateModal(true)
+  }
+
+  const handleDeleteEmployee = async (id: number) => {
+    setActualUserId(id)
+    setOpenDeleteModal(true)
   }
 
   return (
@@ -48,10 +41,10 @@ export default function UsersTable () {
         <div className='flex flex-col items-start justify-between gap-4 mb-8 md:flex-row md:items-center'>
           <div>
             <h1 className='text-3xl font-bold text-gray-800'>
-              Gestión de Usuarios
+              Gestión de Empleados
             </h1>
             <p className='mt-1 text-gray-500'>
-              Administra los usuarios del sistema
+              Administra los empleados del sistema
             </p>
           </div>
         </div>
@@ -60,7 +53,7 @@ export default function UsersTable () {
           <div className='p-6 border-b border-gray-100'>
             <div className='flex flex-col items-start justify-between gap-4 md:flex-row md:items-center'>
               <h2 className='text-xl font-semibold text-gray-800'>
-                Lista de Usuarios
+                Lista de Empleados
               </h2>
 
               <Button
@@ -69,7 +62,7 @@ export default function UsersTable () {
                 className='transition-colors bg-blue-600 shadow-md hover:bg-blue-700'
               >
                 <PlusCircle className='w-8 h-8' />
-                Crear Usuario
+                Crear Empleado
               </Button>
             </div>
           </div>
@@ -81,30 +74,34 @@ export default function UsersTable () {
                   <th className='px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[60px]'>
                     #
                   </th>
+
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
-                    Usuario
+                    Nombre Completo
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
                     Email
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
-                    Estado
+                    Activo
+                  </th>
+                  {/* <th className='px-6 py-4 text-xs font-medium tracking-wider text-right text-gray-500 uppercase'>
+                    DNI
+                  </th> */}
+                  <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
+                    Puesto
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
-                    Último Acceso
+                    Fecha de Contratación
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
-                    Rol
-                  </th>
-                  <th className='px-6 py-4 text-xs font-medium tracking-wider text-right text-gray-500 uppercase'>
                     Acciones
                   </th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-100'>
-                {usersList?.map((user, index) => (
+                {employees?.map((employee, index) => (
                   <tr
-                    key={user.id}
+                    key={employee.id}
                     className='transition-colors hover:bg-gray-50'
                   >
                     <td className='px-6 py-4 text-sm font-medium text-center text-gray-500 whitespace-nowrap'>
@@ -114,7 +111,9 @@ export default function UsersTable () {
                       <div className='flex items-center'>
                         <div className='ml-3'>
                           <div className='text-sm font-semibold text-gray-900'>
-                            {capitalizeString(user.username)}
+                            {capitalizeString(
+                              employee.contacto.nombre_completo
+                            )}
                           </div>
                         </div>
                       </div>
@@ -122,11 +121,11 @@ export default function UsersTable () {
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <div className='flex items-center text-sm text-gray-600'>
                         <Mail className='w-4 h-4 mr-2 text-gray-400' />
-                        {user.email}
+                        {employee.contacto.email}
                       </div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap'>
-                      {user.isActive ? (
+                      {employee.activo ? (
                         <Badge className='text-green-800 bg-green-100 border-green-200 hover:bg-green-200'>
                           Activo
                         </Badge>
@@ -139,36 +138,27 @@ export default function UsersTable () {
                         </Badge>
                       )}
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap'>
-                      <div className='flex items-center text-sm text-gray-600'>
-                        <Calendar className='w-4 h-4 mr-2 text-gray-400' />
-                        {formatDate(user.lastLogin)}
+                    <td className='px-5 py-4 whitespace-nowrap'>
+                      <div className='flex items-center'>
+                        <div className='text-sm font-semibold text-gray-900'>
+                          {capitalizeString(employee.puesto.nombre_puesto)}
+                        </div>
                       </div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap'>
-                      {user.roles.map(role => (
-                        <div key={role.name} className='flex items-center'>
-                          <Shield className='w-4 h-4 mr-2 text-gray-400' />
-                          <span
-                            className={`text-sm ${
-                              role.name === 'admin'
-                                ? 'text-purple-700 font-medium'
-                                : 'text-gray-600'
-                            }`}
-                          >
-                            {role.name === 'admin'
-                              ? 'Administrador'
-                              : 'Usuario'}
-                          </span>
-                        </div>
-                      ))}
+                      <div className='flex items-center text-sm text-gray-600'>
+                        <Calendar className='w-4 h-4 mr-2 text-gray-400' />
+                        {formatDate(employee.fecha_contratacion.toString())}
+                      </div>
                     </td>
-                    <td className='px-6 py-4 text-sm font-medium text-right whitespace-nowrap'>
-                      <div className='flex justify-end gap-2'>
+                    <td className='px-6 py-4 text-sm font-medium text-left whitespace-nowrap'>
+                      <div className='flex justify-start gap-3'>
                         <Button
                           size='sm'
                           variant='outline'
-                          onClick={() => handleUpdateUser(user?.id)}
+                          onClick={() =>
+                            handleUpdateUser(parseInt(employee?.id))
+                          }
                           className='text-blue-700 transition-colors border-blue-200 hover:bg-blue-50 hover:text-blue-800'
                         >
                           <Pencil className='w-4 h-4 mr-1' />
@@ -177,7 +167,9 @@ export default function UsersTable () {
                         <Button
                           size='sm'
                           variant='outline'
-                          onClick={() => handleDeleteUser(user.id)}
+                          onClick={() =>
+                            handleDeleteEmployee(parseInt(employee?.id))
+                          }
                           className='text-red-700 transition-colors border-red-200 hover:bg-red-50 hover:text-red-800'
                         >
                           <Trash2 className='w-4 h-4 mr-1' />
@@ -194,24 +186,23 @@ export default function UsersTable () {
           <div className='px-6 py-4 border-t border-gray-100 bg-gray-50'>
             <div className='flex items-center justify-between'>
               <p className='text-sm text-gray-500'>
-                Mostrando {usersList.length} de {usersList.length} usuarios
+                Mostrando {employees.length} de {employees.length} empleados
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <CreateUserModal
+      <CreateEmpleadoModal
         isEditing={!!actualUserId}
         open={openCreateModal}
         onOpenChange={handleOpenChange}
-        userId={actualUserId ?? null}
+        empleadoId={actualUserId ?? null}
       />
-
-      <DeleteUserModal
+      <DeleteEmployeeModal
+        employeeId={actualUserId ?? null}
         isOpen={openDeleteModal}
         onOpenChange={setOpenDeleteModal}
-        userId={actualUserId}
       />
     </div>
   )
