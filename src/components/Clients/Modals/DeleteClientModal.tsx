@@ -8,30 +8,31 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { useAuthStore } from '@/hooks/useAuthStore'
+import { useClientStore } from '@/hooks/useClientStore'
 
-type DeleteUserModalProps = {
+type DeleteClientModalProps = {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-  userId: string | null
+  employeeId: number | null
 }
 
-export function DeleteUserModal ({
+export function DeleteClientModal ({
   isOpen,
   onOpenChange,
-  userId
-}: DeleteUserModalProps) {
-  const { deleteUser, error } = useAuthStore()
+  employeeId
+}: DeleteClientModalProps) {
+  const { error, deleteClient } = useClientStore()
 
-  const handleDeleteUser = async () => {
-    if (!userId) return
+  const handleDeleteClient = async () => {
+    if (!employeeId) return
 
-    console.log('Deleting user with ID:', userId)
+    console.log('Deleting user with ID:', employeeId)
 
-    await deleteUser(userId)
+    await deleteClient(employeeId)
 
     if (!error) onOpenChange(false)
   }
+
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -44,7 +45,10 @@ export function DeleteUserModal ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteUser} className='bg-red-600'>
+          <AlertDialogAction
+            onClick={handleDeleteClient}
+            className='bg-red-600'
+          >
             Continuar
           </AlertDialogAction>
         </AlertDialogFooter>

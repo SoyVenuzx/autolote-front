@@ -1,20 +1,21 @@
-import { Button } from '@/components/ui/button'
-import { DialogFooter, DialogHeader } from '@/components/ui/dialog'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { useGlobalStore } from '@/hooks/useGlobalStore'
+import { useSupplierStore } from '@/hooks/useSupplierStore'
 import {
-  CalendarIcon,
-  UserIcon,
-  BriefcaseIcon,
-  CheckIcon,
-  XIcon
-} from 'lucide-react'
+  createProveedorSchema,
+  updateProveedorSchema,
+  type ProveedorFormType
+} from '@/schemas/createSupplier.schema'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Spinner } from '@/components/ui/spinner'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
+  Dialog,
+  DialogHeader,
+  DialogContent,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -23,52 +24,46 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { useEffect, useState } from 'react'
-import { Spinner } from '@/components/ui/spinner'
+import { CalendarIcon, CheckIcon, User, UserIcon, XIcon } from 'lucide-react'
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Popover, PopoverTrigger } from '@radix-ui/react-popover'
+import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { PopoverContent } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
+import { es } from 'date-fns/locale'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useEmployeeStore } from '@/hooks/useEmployeeStore'
-import {
-  createEmpleadoSchema,
-  updateEmpleadoSchema,
-  type CreateEmpleadoType,
-  type EmpleadoFormType
-} from '@/schemas/createEmployee.schema'
-import { useGlobalStore } from '@/hooks/useGlobalStore'
 
-type CreateEmpleadoModalProps = {
+type CreateSupplierModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   isEditing?: boolean
-  empleadoId?: number | null
+  proveedorId?: number | null
 }
 
-export const CreateEmpleadoModal = ({
+export const CreateSupplierModal = ({
   open,
   onOpenChange,
   isEditing = false,
-  empleadoId = null
-}: CreateEmpleadoModalProps) => {
+  proveedorId = null
+}: CreateSupplierModalProps) => {
   const [loading, setLoading] = useState(false)
 
   const { contactos } = useGlobalStore()
 
-  const { isLoading, getEmployeeById, puestos, createEmployee } =
-    useEmployeeStore()
+  const { isLoading, getSupplierById } = useSupplierStore()
 
-  const formSchema = isEditing ? updateEmpleadoSchema : createEmpleadoSchema
+  const formSchema = isEditing ? updateProveedorSchema : createProveedorSchema
 
-  const form = useForm<EmpleadoFormType>({
+  const form = useForm<ProveedorFormType>({
     resolver: zodResolver(formSchema),
     mode: 'onBlur',
     defaultValues: {
@@ -77,92 +72,13 @@ export const CreateEmpleadoModal = ({
     }
   })
 
-  // Cargar datos del empleado para edición
-  useEffect(() => {
-    if (!isEditing || !empleadoId) return
+  useEffect(() => {}, [open, proveedorId, isEditing, getSupplierById])
 
-    const fetchEmpleado = async () => {
-      setLoading(true)
-      try {
-        const empleado = await getEmployeeById(empleadoId)
-
-        if (empleado) {
-          form.setValue('contacto_id', parseInt(empleado.contacto_id))
-          form.setValue('puesto_id', parseInt(empleado.puesto_id))
-
-          // Convertir strings de fecha a objetos Date para el formulario
-          if (empleado.fecha_contratacion) {
-            form.setValue(
-              'fecha_contratacion',
-              new Date(empleado.fecha_contratacion)
-            )
-          }
-
-          if (empleado.fecha_desvinculacion) {
-            form.setValue(
-              'fecha_desvinculacion',
-              new Date(empleado.fecha_desvinculacion)
-            )
-          } else {
-            form.setValue('fecha_desvinculacion', null)
-          }
-
-          form.setValue('activo', empleado.activo)
-        }
-      } catch (error) {
-        console.error('Error al cargar empleado:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchEmpleado()
-  }, [open, empleadoId, isEditing, getEmployeeById])
-
-  // Resetear formulario al cerrar
   useEffect(() => {
     if (!open) {
       form.reset()
     }
   }, [open, form])
-
-  // Manejar envío del formulario
-  const handleSubmit = async (data: EmpleadoFormType) => {
-    try {
-      if (!isEditing) await createEmployee(data as CreateEmpleadoType)
-      else if (!empleadoId) {
-        return
-      }
-      onOpenChange(false)
-    } catch (error) {
-      console.error('Error al guardar empleado:', error)
-    }
-  }
-
-  // Manejar cambio en checkbox de activo
-  const handleActivoChange = (checked: boolean) => {
-    form.setValue('activo', checked)
-
-    // Si se marca como inactivo y no hay fecha de desvinculación, establecer la fecha actual
-    if (!checked && !form.getValues('fecha_desvinculacion')) {
-      form.setValue('fecha_desvinculacion', new Date())
-    }
-
-    // Si se marca como activo, eliminar fecha de desvinculación
-    if (checked) {
-      form.setValue('fecha_desvinculacion', null)
-    }
-  }
-
-  // Manejar cambio en fecha de desvinculación
-  const handleDesvinculacionChange = (date: Date | undefined) => {
-    if (date) {
-      form.setValue('fecha_desvinculacion', date)
-      form.setValue('activo', false)
-    } else {
-      form.setValue('fecha_desvinculacion', null)
-    }
-  }
 
   if (loading) {
     return <Spinner size='medium' />
@@ -172,16 +88,13 @@ export const CreateEmpleadoModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[600px] p-0 overflow-hidden rounded-lg'>
         <DialogHeader className='py-2 border-b bg-gray-50'>
-          <DialogTitle className='text-xl font-semibold text-center text-gray-800'>
-            {isEditing ? 'Editar Empleado' : 'Registrar Nuevo Empleado'}
+          <DialogTitle className='font-semibold text-center text-gray-800 text-l'>
+            {isEditing ? 'Editar Proveedor' : 'Crear Proveedor'}
           </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className='px-5 py-4'
-          >
+          <form onSubmit={form.handleSubmit(() => {})} className='px-5 py-4'>
             <div className='space-y-4'>
               {/* Contacto */}
               <FormField
@@ -224,47 +137,36 @@ export const CreateEmpleadoModal = ({
                 )}
               />
 
-              {/* Puesto */}
+              {/* Tipo Proveedor */}
               <FormField
                 control={form.control}
-                name='puesto_id'
+                name='tipo_proveedor'
                 render={({ field }) => (
                   <FormItem>
                     <div className='space-y-2'>
                       <FormLabel
-                        htmlFor='puesto_id'
+                        htmlFor='email'
                         className='flex items-center text-sm font-medium'
                       >
-                        <BriefcaseIcon className='w-4 h-4 mr-2 text-gray-500' />
-                        Puesto
+                        <User className='w-4 h-4 mr-2 text-gray-500' />
+                        Tipo de Proveedor
                       </FormLabel>
-                      <Select
-                        onValueChange={value => field.onChange(parseInt(value))}
-                        value={field.value?.toString()}
-                      >
-                        <FormControl>
-                          <SelectTrigger className='border-gray-200 focus:border-blue-500'>
-                            <SelectValue placeholder='Seleccionar puesto' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {puestos.map(puesto => (
-                            <SelectItem
-                              key={puesto.id}
-                              value={puesto.id.toString()}
-                            >
-                              {puesto.nombre_puesto}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <Input
+                          id='tipo_proveedor'
+                          {...field}
+                          className='border-gray-200 focus:border-blue-500'
+                          placeholder='Ingrese el tipo de proveedor'
+                          required={!isEditing}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </div>
                   </FormItem>
                 )}
               />
 
-              {/* Fecha de contratación */}
+              {/* Fecha de Contratación */}
               <FormField
                 control={form.control}
                 name='fecha_contratacion'
@@ -347,7 +249,7 @@ export const CreateEmpleadoModal = ({
                         <Calendar
                           mode='single'
                           selected={field.value || undefined}
-                          onSelect={date => handleDesvinculacionChange(date)}
+                          // onSelect={date => handleDesvinculacionChange(date)}
                           disabled={date =>
                             date < form.getValues('fecha_contratacion')! ||
                             date > new Date()
@@ -362,10 +264,10 @@ export const CreateEmpleadoModal = ({
                         type='button'
                         variant='ghost'
                         className='mt-1 text-xs text-red-500 w-fit hover:text-red-700'
-                        onClick={() => {
-                          handleDesvinculacionChange(undefined)
-                          form.setValue('activo', true)
-                        }}
+                        // onClick={() => {
+                        //   handleDesvinculacionChange(undefined)
+                        //   form.setValue('activo', true)
+                        // }}
                       >
                         Eliminar fecha de desvinculación
                       </Button>
@@ -383,7 +285,7 @@ export const CreateEmpleadoModal = ({
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        onCheckedChange={handleActivoChange}
+                        // onCheckedChange={handleActivoChange}
                       />
                     </FormControl>
                     <div className='space-y-1 leading-none'>
@@ -420,8 +322,8 @@ export const CreateEmpleadoModal = ({
                 {isLoading
                   ? 'Guardando...'
                   : isEditing
-                  ? 'Actualizar Empleado'
-                  : 'Crear Empleado'}
+                  ? 'Actualizar Proveedor'
+                  : 'Crear Proveedor'}
               </Button>
             </DialogFooter>
           </form>

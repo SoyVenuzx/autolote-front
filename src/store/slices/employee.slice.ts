@@ -6,7 +6,7 @@ import type { CreateEmpleadoType } from '@/schemas/createEmployee.schema'
 
 export const createEmployeeSlice: StateCreator<EmployeeSliceType> = (
   set,
-  get
+  _
 ) => {
   return {
     employees: [],
@@ -21,8 +21,8 @@ export const createEmployeeSlice: StateCreator<EmployeeSliceType> = (
 
         set({ employees: data?.data })
       } catch (error) {
-        console.error('Error al obtener usuarios:', error)
-        toast.error('Error al obtener usuarios')
+        console.error('Error al obtener empleados:', error)
+        toast.error('Error al obtener empleados')
       }
     },
     getEmployeeById: async (id: number) => {
@@ -31,18 +31,8 @@ export const createEmployeeSlice: StateCreator<EmployeeSliceType> = (
 
         return data?.data
       } catch (error) {
-        console.error('Error al obtener usuario por ID:', error)
-        toast.error('Error al obtener usuario por ID')
-      }
-    },
-    getContactos: async () => {
-      try {
-        const { data } = await api.get('/contact')
-
-        set({ contactos: data?.data })
-      } catch (error) {
-        console.error('Error al obtener contactos:', error)
-        toast.error('Error al obtener contactos')
+        console.error('Error al obtener empleado por ID:', error)
+        toast.error('Error al obtener empleado por ID')
       }
     },
     getPuestos: async () => {
@@ -84,10 +74,10 @@ export const createEmployeeSlice: StateCreator<EmployeeSliceType> = (
         const { data } = await api.delete(`/employee/${id}`)
 
         set({ isLoadingEmployee: false, employees: data?.data })
-        toast.success('Usuario eliminado exitosamente')
+        toast.success('Empleado eliminado exitosamente')
       } catch (error: any) {
         const errorMessage =
-          error.response?.data?.message || 'Error al eliminar usuario'
+          error.response?.data?.message || 'Error al eliminar Empleado'
 
         toast.error(errorMessage)
 

@@ -1,41 +1,34 @@
-import {
-  PlusCircle,
-  Pencil,
-  Trash2,
-  Mail,
-  Calendar,
-  Shield
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { capitalizeString, formatDate } from '@/lib/utils'
-import { useAuthStore } from '@/hooks/useAuthStore'
+import { useClientStore } from '@/hooks/useClientStore'
+import { Building, Mail, Pencil, PlusCircle, Trash2 } from 'lucide-react'
+import { Badge } from '../ui/badge'
 import { useState } from 'react'
-import { CreateUserModal } from './Modals/CreateUserModal'
-import { DeleteUserModal } from './Modals/DeleteUserModal'
+import { Button } from '@/components/ui/button'
+import { capitalizeString } from '@/lib/utils'
+import { DeleteClientModal } from './Modals/DeleteClientModal'
+import { CreateClientModal } from './Modals/CreateClientModal'
 
-export default function UsersTable () {
-  const { usersList } = useAuthStore()
+export default function ClientsTable () {
+  const { clients } = useClientStore()
 
   const [openCreateModal, setOpenCreateModal] = useState(false)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [actualUserId, setActualUserId] = useState<number | null>(null)
 
-  const [actualUserId, setActualUserId] = useState<string | null>(null)
-
-  if (!usersList) return null
+  if (!clients) return null
 
   const handleOpenChange = (open: boolean) => {
     if (actualUserId) setActualUserId(null)
+
     setOpenCreateModal(open)
   }
 
-  const handleDeleteUser = (userId: string) => {
-    setActualUserId(userId)
+  const handleDeleteClient = async (id: number) => {
+    setActualUserId(id)
     setOpenDeleteModal(true)
   }
 
-  const handleUpdateUser = (userId: string) => {
-    setActualUserId(userId)
+  const handleUpdateUser = (id: number | null) => {
+    setActualUserId(id)
     setOpenCreateModal(true)
   }
 
@@ -45,10 +38,10 @@ export default function UsersTable () {
         <div className='flex flex-col items-start justify-between gap-4 mb-8 md:flex-row md:items-center'>
           <div>
             <h1 className='text-3xl font-bold text-gray-800'>
-              Gestión de Usuarios
+              Gestión de Clientes
             </h1>
             <p className='mt-1 text-gray-500'>
-              Administra los usuarios del sistema
+              Administra los clients del sistema
             </p>
           </div>
         </div>
@@ -57,7 +50,7 @@ export default function UsersTable () {
           <div className='p-6 border-b border-gray-100'>
             <div className='flex flex-col items-start justify-between gap-4 md:flex-row md:items-center'>
               <h2 className='text-xl font-semibold text-gray-800'>
-                Lista de Usuarios
+                Lista de Clients
               </h2>
 
               <Button
@@ -66,7 +59,7 @@ export default function UsersTable () {
                 className='transition-colors bg-blue-600 shadow-md hover:bg-blue-700'
               >
                 <PlusCircle className='w-8 h-8' />
-                Crear Usuario
+                Crear Cliente
               </Button>
             </div>
           </div>
@@ -78,30 +71,28 @@ export default function UsersTable () {
                   <th className='px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[60px]'>
                     #
                   </th>
+
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
-                    Usuario
+                    Nombre Completo
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
                     Email
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
-                    Estado
+                    Empresa
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
-                    Último Acceso
+                    Activo
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
-                    Rol
-                  </th>
-                  <th className='px-6 py-4 text-xs font-medium tracking-wider text-right text-gray-500 uppercase'>
                     Acciones
                   </th>
                 </tr>
               </thead>
               <tbody className='divide-y divide-gray-100'>
-                {usersList?.map((user, index) => (
+                {clients?.map((client, index) => (
                   <tr
-                    key={user.id}
+                    key={client.id}
                     className='transition-colors hover:bg-gray-50'
                   >
                     <td className='px-6 py-4 text-sm font-medium text-center text-gray-500 whitespace-nowrap'>
@@ -111,7 +102,7 @@ export default function UsersTable () {
                       <div className='flex items-center'>
                         <div className='ml-3'>
                           <div className='text-sm font-semibold text-gray-900'>
-                            {capitalizeString(user.username)}
+                            {capitalizeString(client.contacto.nombre_completo)}
                           </div>
                         </div>
                       </div>
@@ -119,11 +110,19 @@ export default function UsersTable () {
                     <td className='px-6 py-4 whitespace-nowrap'>
                       <div className='flex items-center text-sm text-gray-600'>
                         <Mail className='w-4 h-4 mr-2 text-gray-400' />
-                        {user.email}
+                        {client.contacto.email}
                       </div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap'>
-                      {user.isActive ? (
+                      <div className='flex items-center text-sm text-gray-600'>
+                        <Building className='w-4 h-4 mr-2 text-gray-400' />
+                        {capitalizeString(
+                          client.contacto.nombre_empresa?.trim().toString()!
+                        )}
+                      </div>
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      {client.activo ? (
                         <Badge className='text-green-800 bg-green-100 border-green-200 hover:bg-green-200'>
                           Activo
                         </Badge>
@@ -136,36 +135,12 @@ export default function UsersTable () {
                         </Badge>
                       )}
                     </td>
-                    <td className='px-6 py-4 whitespace-nowrap'>
-                      <div className='flex items-center text-sm text-gray-600'>
-                        <Calendar className='w-4 h-4 mr-2 text-gray-400' />
-                        {formatDate(user.lastLogin)}
-                      </div>
-                    </td>
-                    <td className='px-6 py-4 whitespace-nowrap'>
-                      {user.roles.map(role => (
-                        <div key={role.name} className='flex items-center'>
-                          <Shield className='w-4 h-4 mr-2 text-gray-400' />
-                          <span
-                            className={`text-sm ${
-                              role.name === 'admin'
-                                ? 'text-purple-700 font-medium'
-                                : 'text-gray-600'
-                            }`}
-                          >
-                            {role.name === 'admin'
-                              ? 'Administrador'
-                              : 'Usuario'}
-                          </span>
-                        </div>
-                      ))}
-                    </td>
-                    <td className='px-6 py-4 text-sm font-medium text-right whitespace-nowrap'>
-                      <div className='flex justify-end gap-2'>
+                    <td className='px-6 py-4 text-sm font-medium text-left whitespace-nowrap'>
+                      <div className='flex justify-start gap-3'>
                         <Button
                           size='sm'
                           variant='outline'
-                          onClick={() => handleUpdateUser(user?.id)}
+                          onClick={() => handleUpdateUser(parseInt(client?.id))}
                           className='text-blue-700 transition-colors border-blue-200 hover:bg-blue-50 hover:text-blue-800'
                         >
                           <Pencil className='w-4 h-4 mr-1' />
@@ -174,7 +149,9 @@ export default function UsersTable () {
                         <Button
                           size='sm'
                           variant='outline'
-                          onClick={() => handleDeleteUser(user.id)}
+                          onClick={() =>
+                            handleDeleteClient(parseInt(client?.id))
+                          }
                           className='text-red-700 transition-colors border-red-200 hover:bg-red-50 hover:text-red-800'
                         >
                           <Trash2 className='w-4 h-4 mr-1' />
@@ -191,24 +168,24 @@ export default function UsersTable () {
           <div className='px-6 py-4 border-t border-gray-100 bg-gray-50'>
             <div className='flex items-center justify-between'>
               <p className='text-sm text-gray-500'>
-                Mostrando {usersList.length} de {usersList.length} usuarios
+                Mostrando {clients.length} de {clients.length} clientes
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <CreateUserModal
+      <CreateClientModal
         isEditing={!!actualUserId}
         open={openCreateModal}
         onOpenChange={handleOpenChange}
-        userId={actualUserId ?? null}
+        clientId={actualUserId ?? null}
       />
 
-      <DeleteUserModal
+      <DeleteClientModal
+        employeeId={actualUserId ?? null}
         isOpen={openDeleteModal}
         onOpenChange={setOpenDeleteModal}
-        userId={actualUserId}
       />
     </div>
   )

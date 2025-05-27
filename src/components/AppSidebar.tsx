@@ -13,14 +13,19 @@ export function AppSidebar () {
       href: '/dashboard'
     },
     {
+      title: 'Vehículos',
+      icon: Car,
+      href: '/dashboard/vehicles'
+    },
+    {
       title: 'Clientes',
       icon: Users,
       href: '/dashboard/clients'
     },
     {
-      title: 'Vehículos',
-      icon: Car,
-      href: '/dashboard/vehicles'
+      title: 'Proveedores',
+      icon: Users,
+      href: '/dashboard/suppliers'
     },
     {
       title: 'Usuarios',

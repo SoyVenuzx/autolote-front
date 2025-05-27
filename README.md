@@ -1,4 +1,22 @@
-# React + TypeScript + Vite
+
+## Todo
+
+- [x] Crear el CRUD de Clientes en Insomnia para testear las peticiones
+- [x] Avanzar con el CRUD de Clientes en el FrontEnd 
+
+- [x] Tratar de incluir la entidad Proveedores en el Front
+
+- [ ] Agregar la funcionalidad de Update en Empleados
+
+- [ ] Terminar la funcionalidad de crear/editar Proveedores
+
+- [ ] Verificar el return de datos para proveedores en el Backend 
+
+- [ ] Verificar el Update de Clientes en Backend
+
+- [ ] Implementar el CRUD para contacos en el front 
+
+<!-- # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -51,4 +69,4 @@ export default tseslint.config({
     ...reactDom.configs.recommended.rules,
   },
 })
-```
+``` -->

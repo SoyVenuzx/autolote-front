@@ -1,7 +1,5 @@
-import type {
-  CreateEmpleadoType,
-  UpdateEmpleadoType
-} from '@/schemas/createEmployee.schema'
+import type { CreateEmpleadoType } from '@/schemas/createEmployee.schema'
+import type { Contacto } from './globalData.type'
 
 export interface Employee {
   id: string
@@ -12,13 +10,6 @@ export interface Employee {
   activo: boolean
   contacto: Contacto
   puesto: Puesto
-}
-
-export interface Contacto {
-  id: number
-  nombre_completo: string
-  email: string
-  dni_ruc: string
 }
 
 export interface Puesto {
@@ -39,5 +30,4 @@ export type EmployeeSliceType = {
   getEmployees: () => Promise<void>
   getEmployeeById: (id: number) => Promise<Employee | null>
   getPuestos: () => Promise<void>
-  getContactos: () => Promise<void>
 }

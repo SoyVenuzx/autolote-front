@@ -3,21 +3,20 @@ import { useEmployeeStore } from '@/hooks/useEmployeeStore'
 import { useEffect } from 'react'
 
 export default function EmpleadosPage () {
-  const { getEmployees, getContactos, getPuestos } = useEmployeeStore()
+  const { getEmployees, getPuestos } = useEmployeeStore()
 
   useEffect(() => {
-    async function fetchUsers () {
+    async function fetchEmployeeData () {
       try {
         await getEmployees()
-        await getContactos()
         await getPuestos()
       } catch (error) {
         console.error('Error fetching users:', error)
       }
     }
 
-    fetchUsers()
-  }, [getEmployees, getPuestos, getContactos])
+    fetchEmployeeData()
+  }, [getEmployees, getPuestos])
 
   return <EmployeesTable />
 }

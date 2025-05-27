@@ -11,7 +11,6 @@ export const useEmployeeStore = () => {
     deleteEmployee: Store(state => state.deleteEmployee),
     getEmployees: Store(state => state.getEmployees),
     getEmployeeById: Store(state => state.getEmployeeById),
-    getContactos: Store(state => state.getContactos),
     getPuestos: Store(state => state.getPuestos)
   }
 }

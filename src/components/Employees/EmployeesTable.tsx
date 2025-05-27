@@ -14,10 +14,7 @@ export default function EmployeesTable () {
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [actualUserId, setActualUserId] = useState<number | null>(null)
 
-  if (!employees) {
-    console.log('No hay empleados disponibles', employees)
-    return null
-  }
+  if (!employees) return null
 
   const handleOpenChange = (open: boolean) => {
     if (actualUserId) setActualUserId(null)

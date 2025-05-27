@@ -10,8 +10,25 @@ import EmpleadosPage from './pages/EmpleadosPage'
 import VentasPage from './pages/VentasPage'
 import ProtectedRoute from './components/SafeRoutes/ProtectedRoute'
 import { NotFoundPage } from './components/NotFoundPage'
+import { useEffect } from 'react'
+import { useGlobalStore } from './hooks/useGlobalStore'
+import ProveedoresPage from './pages/ProveedoresPage'
 
 function App () {
+  const { getContactos } = useGlobalStore()
+
+  useEffect(() => {
+    async function fetchContactos () {
+      try {
+        await getContactos()
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+
+    fetchContactos()
+  }, [getContactos])
+
   return (
     <Routes>
       <Route path='/login' element={<LoginPage />} />
@@ -32,6 +49,7 @@ function App () {
         <Route path='vehicles' element={<VehiculosPage />} />
         <Route path='users' element={<UsuariosPage />} />
         <Route path='employees' element={<EmpleadosPage />} />
+        <Route path='suppliers' element={<ProveedoresPage />} />
         <Route path='sales' element={<VentasPage />} />
       </Route>
 

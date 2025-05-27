@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useEmployeeStore } from '@/hooks/useEmployeeStore'
 
-type DeleteUserModalProps = {
+type DeleteEmployeeModalProps = {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   employeeId: number | null
@@ -20,7 +20,7 @@ export function DeleteEmployeeModal ({
   isOpen,
   onOpenChange,
   employeeId
-}: DeleteUserModalProps) {
+}: DeleteEmployeeModalProps) {
   const { deleteEmployee, error } = useEmployeeStore()
 
   const handleDeleteEmployee = async () => {
@@ -44,7 +44,10 @@ export function DeleteEmployeeModal ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteEmployee}>
+          <AlertDialogAction
+            onClick={handleDeleteEmployee}
+            className='bg-red-600'
+          >
             Continuar
           </AlertDialogAction>
         </AlertDialogFooter>

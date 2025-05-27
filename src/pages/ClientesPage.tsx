@@ -1,10 +1,21 @@
-export default function ClientesPage() {
-  return (
-    <div className="px-4 py-6 sm:px-6 lg:px-8">
-      <h1 className="mb-6 text-2xl font-bold">Gestión de Clientes</h1>
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <p className="text-gray-500">Aquí irá el contenido de la página de clientes.</p>
-      </div>
-    </div>
-  )
+import ClientsTable from '@/components/Clients/ClientsTable'
+import { useClientStore } from '@/hooks/useClientStore'
+import { useEffect } from 'react'
+
+export default function ClientesPage () {
+  const { getClients } = useClientStore()
+
+  useEffect(() => {
+    async function fetchClients () {
+      try {
+        await getClients()
+      } catch (error) {
+        console.error('Error fetching clients:', error)
+      }
+    }
+
+    fetchClients()
+  }, [getClients])
+
+  return <ClientsTable />
 }
