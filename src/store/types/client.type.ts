@@ -1,4 +1,7 @@
-import type { CreateClientType } from '@/schemas/createClient.schema'
+import type {
+  CreateClientType,
+  UpdateClientType
+} from '@/schemas/createClient.schema'
 import type { Contacto } from './globalData.type'
 
 export interface Cliente {
@@ -19,5 +22,6 @@ export type ClienteSliceType = {
   getClientById: (id: number) => Promise<Cliente | null>
 
   createClient: (data: CreateClientType) => Promise<void>
+  updateClient: (id: number, data: UpdateClientType) => Promise<void>
   deleteClient: (id: number) => Promise<void>
 }

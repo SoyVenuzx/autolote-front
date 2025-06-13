@@ -8,6 +8,7 @@ export const useEmployeeStore = () => {
     contactos: Store(state => state.contactos),
     puestos: Store(state => state.puestos),
     createEmployee: Store(state => state.createEmployee),
+    updateEmployee: Store(state => state.updateEmployee),
     deleteEmployee: Store(state => state.deleteEmployee),
     getEmployees: Store(state => state.getEmployees),
     getEmployeeById: Store(state => state.getEmployeeById),

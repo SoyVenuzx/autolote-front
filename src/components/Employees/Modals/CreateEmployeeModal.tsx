@@ -63,8 +63,13 @@ export const CreateEmpleadoModal = ({
 
   const { contactos } = useGlobalStore()
 
-  const { isLoading, getEmployeeById, puestos, createEmployee } =
-    useEmployeeStore()
+  const {
+    isLoading,
+    getEmployeeById,
+    puestos,
+    createEmployee,
+    updateEmployee
+  } = useEmployeeStore()
 
   const formSchema = isEditing ? updateEmpleadoSchema : createEmpleadoSchema
 
@@ -130,9 +135,12 @@ export const CreateEmpleadoModal = ({
   const handleSubmit = async (data: EmpleadoFormType) => {
     try {
       if (!isEditing) await createEmployee(data as CreateEmpleadoType)
-      else if (!empleadoId) {
-        return
+      else {
+        if (!empleadoId) return
+
+        await updateEmployee(empleadoId, data)
       }
+
       onOpenChange(false)
     } catch (error) {
       console.error('Error al guardar empleado:', error)

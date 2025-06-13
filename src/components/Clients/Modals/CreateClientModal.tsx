@@ -54,7 +54,8 @@ export const CreateClientModal = ({
 
   const { contactos } = useGlobalStore()
 
-  const { isLoading, getClientById, createClient } = useClientStore()
+  const { isLoading, getClientById, createClient, updateClient } =
+    useClientStore()
 
   const formSchema = isEditing ? updateClientSchema : createClientSchema
 
@@ -103,8 +104,10 @@ export const CreateClientModal = ({
     try {
       if (!isEditing) {
         await createClient(data as CreateClientType)
-      } else if (!clientId) {
-        return
+      } else {
+        if (!clientId) return
+
+        await updateClient(clientId, data)
       }
       onOpenChange(false)
     } catch (error) {

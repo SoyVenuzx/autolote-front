@@ -1,3 +1,7 @@
+import type {
+  createProveedorType,
+  updateProveedortype
+} from '@/schemas/createSupplier.schema'
 import type { Contacto } from './globalData.type'
 
 export interface Supplier {
@@ -14,6 +18,10 @@ export type SupplierSliceType = {
   contactos: Contacto[]
   isLoadingSupplier: boolean
   errorSupplier: string | null
+
+  createSupplier: (formData: createProveedorType) => Promise<void>
+  deleteSupplier: (id: string) => Promise<void>
+  updateSupplier: (id: string, data: updateProveedortype) => Promise<void>
 
   getSuppliers: () => Promise<void>
   getSupplierById: (id: string) => Promise<Supplier | null>

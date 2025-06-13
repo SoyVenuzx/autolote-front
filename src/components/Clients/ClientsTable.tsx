@@ -79,6 +79,9 @@ export default function ClientsTable () {
                     Email
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
+                    Nota
+                  </th>
+                  <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
                     Empresa
                   </th>
                   <th className='px-6 py-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>
@@ -111,6 +114,12 @@ export default function ClientsTable () {
                       <div className='flex items-center text-sm text-gray-600'>
                         <Mail className='w-4 h-4 mr-2 text-gray-400' />
                         {client.contacto.email}
+                      </div>
+                    </td>
+                    <td className='px-6 py-4 whitespace-nowrap'>
+                      <div className='flex items-center text-sm text-gray-600'>
+                        <Mail className='w-4 h-4 mr-2 text-gray-400' />
+                        {client.notas_cliente}
                       </div>
                     </td>
                     <td className='px-6 py-4 whitespace-nowrap'>

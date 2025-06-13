@@ -274,7 +274,7 @@ export const CreateUserModal = ({
                         <FormControl>
                           <div className='relative'>
                             <Input
-                              id='password'
+                              id='confirmPassword'
                               type={showConfirmPassword ? 'text' : 'password'}
                               {...field}
                               placeholder='••••••••'

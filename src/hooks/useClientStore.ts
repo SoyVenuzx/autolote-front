@@ -11,6 +11,7 @@ export const useClientStore = () => {
     getClientById: Store(state => state.getClientById),
 
     createClient: Store(state => state.createClient),
+    updateClient: Store(state => state.updateClient),
     deleteClient: Store(state => state.deleteClient)
   }
 }

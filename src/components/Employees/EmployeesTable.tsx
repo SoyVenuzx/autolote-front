@@ -22,8 +22,8 @@ export default function EmployeesTable () {
     setOpenCreateModal(open)
   }
 
-  const handleUpdateUser = (userId: number | null) => {
-    setActualUserId(userId)
+  const handleUpdateEmployee = (employeeId: number | null) => {
+    setActualUserId(employeeId)
     setOpenCreateModal(true)
   }
 
@@ -154,7 +154,7 @@ export default function EmployeesTable () {
                           size='sm'
                           variant='outline'
                           onClick={() =>
-                            handleUpdateUser(parseInt(employee?.id))
+                            handleUpdateEmployee(parseInt(employee?.id))
                           }
                           className='text-blue-700 transition-colors border-blue-200 hover:bg-blue-50 hover:text-blue-800'
                         >

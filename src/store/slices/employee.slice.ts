@@ -1,8 +1,11 @@
 import type { StateCreator } from 'zustand'
-import type { EmployeeSliceType } from '../types/employee.types'
+import type { Employee, EmployeeSliceType } from '../types/employee.types'
 import { api } from '@/api/axios'
 import toast from 'react-hot-toast'
-import type { CreateEmpleadoType } from '@/schemas/createEmployee.schema'
+import type {
+  CreateEmpleadoType,
+  UpdateEmpleadoType
+} from '@/schemas/createEmployee.schema'
 
 export const createEmployeeSlice: StateCreator<EmployeeSliceType> = (
   set,
@@ -29,7 +32,7 @@ export const createEmployeeSlice: StateCreator<EmployeeSliceType> = (
       try {
         const { data } = await api.get(`/employee/${id}`)
 
-        return data?.data
+        return data
       } catch (error) {
         console.error('Error al obtener empleado por ID:', error)
         toast.error('Error al obtener empleado por ID')
@@ -56,6 +59,30 @@ export const createEmployeeSlice: StateCreator<EmployeeSliceType> = (
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message || 'Error al registrarse'
+
+        toast.error(errorMessage)
+
+        set({
+          isLoadingEmployee: false,
+          errorEmployee: errorMessage
+        })
+
+        throw error
+      }
+    },
+    updateEmployee: async (id: number, dataForm: UpdateEmpleadoType) => {
+      set({ isLoadingEmployee: true, errorEmployee: null })
+      try {
+        const { data } = await api.put<{ message: string; data: Employee[] }>(
+          `/employee/${id}`,
+          dataForm
+        )
+
+        set({ isLoadingEmployee: false, employees: data?.data })
+        toast.success('Empleado actualizado exitosamente')
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || 'Error al actualizar empleado'
 
         toast.error(errorMessage)
 

@@ -1,4 +1,4 @@
-import { Car, CreditCard, Home, Users } from 'lucide-react'
+import { Car, Home, Users } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import ProtectedComponent from '@/components/SafeRoutes/ProtectedComponent'
 
@@ -38,12 +38,12 @@ export function AppSidebar () {
       icon: Users,
       href: '/dashboard/employees',
       roles: ['ROLE_ADMIN']
-    },
-    {
-      title: 'Ventas',
-      icon: CreditCard,
-      href: '/dashboard/sales'
     }
+    // {
+    //   title: 'Ventas',
+    //   icon: CreditCard,
+    //   href: '/dashboard/sales'
+    // }
   ]
 
   return (

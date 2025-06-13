@@ -41,6 +41,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
 import { es } from 'date-fns/locale'
 import { Checkbox } from '@/components/ui/checkbox'
+import { type createProveedorType } from '../../../schemas/createSupplier.schema'
 
 type CreateSupplierModalProps = {
   open: boolean
@@ -59,7 +60,8 @@ export const CreateSupplierModal = ({
 
   const { contactos } = useGlobalStore()
 
-  const { isLoading, getSupplierById } = useSupplierStore()
+  const { isLoading, getSupplierById, createSupplier, updateSupplier } =
+    useSupplierStore()
 
   const formSchema = isEditing ? updateProveedorSchema : createProveedorSchema
 
@@ -72,13 +74,58 @@ export const CreateSupplierModal = ({
     }
   })
 
-  useEffect(() => {}, [open, proveedorId, isEditing, getSupplierById])
+  useEffect(() => {
+    if (!isEditing || !proveedorId) return
+    const fetchProveedor = async () => {
+      setLoading(true)
+
+      try {
+        const proveedor = await getSupplierById(proveedorId?.toString())
+        console.log({ proveedor })
+
+        if (proveedor) {
+          form.setValue('contacto_id', parseInt(proveedor.contacto_id))
+          form.setValue('tipo_proveedor', proveedor.tipo_proveedor)
+
+          if (proveedor.fecha_registro_proveedor) {
+            form.setValue(
+              'fecha_contratacion',
+              new Date(proveedor.fecha_registro_proveedor)
+            )
+          }
+
+          form.setValue('fecha_desvinculacion', null)
+          form.setValue('activo', proveedor.activo)
+        }
+      } catch (error) {
+        console.error('Error al cargar datos del proveedor:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProveedor()
+  }, [open, proveedorId, isEditing, getSupplierById])
 
   useEffect(() => {
     if (!open) {
       form.reset()
     }
   }, [open, form])
+
+  const handleSubmit = async (data: ProveedorFormType) => {
+    try {
+      if (!isEditing) await createSupplier(data as createProveedorType)
+      else {
+        if (!proveedorId) return
+        await updateSupplier(proveedorId.toString(), data)
+      }
+
+      onOpenChange(false)
+    } catch (error) {
+      console.error('Error al guardar proveedor:', error)
+    }
+  }
 
   if (loading) {
     return <Spinner size='medium' />
@@ -94,7 +141,10 @@ export const CreateSupplierModal = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(() => {})} className='px-5 py-4'>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className='px-5 py-4'
+          >
             <div className='space-y-4'>
               {/* Contacto */}
               <FormField

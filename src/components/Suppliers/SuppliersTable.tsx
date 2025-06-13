@@ -5,11 +5,13 @@ import { capitalizeString, formatDate } from '@/lib/utils'
 import { Badge } from '../ui/badge'
 import { CreateSupplierModal } from './Modals/CreateSupplierModal'
 import { useState } from 'react'
+import { DeleteSupplierModal } from './Modals/DeleteSupplierModal'
 
 export const SuppliersTable = () => {
   const { suppliers } = useSupplierStore()
 
   const [openCreateModal, setOpenCreateModal] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [actualUserId, setActualUserId] = useState<number | null>(null)
 
   if (!suppliers) return null
@@ -18,6 +20,16 @@ export const SuppliersTable = () => {
     if (actualUserId) setActualUserId(null)
 
     setOpenCreateModal(open)
+  }
+
+  const handleUpdateSupplier = (supplierId: number | null) => {
+    setActualUserId(supplierId)
+    setOpenCreateModal(true)
+  }
+
+  const handleDeleteSupplier = async (id: number) => {
+    setActualUserId(id)
+    setOpenDeleteModal(true)
   }
 
   return (
@@ -142,7 +154,9 @@ export const SuppliersTable = () => {
                         <Button
                           size='sm'
                           variant='outline'
-                          onClick={() => {}}
+                          onClick={() =>
+                            handleUpdateSupplier(parseInt(supplier?.id))
+                          }
                           className='text-blue-700 transition-colors border-blue-200 hover:bg-blue-50 hover:text-blue-800'
                         >
                           <Pencil className='w-4 h-4 mr-1' />
@@ -151,7 +165,9 @@ export const SuppliersTable = () => {
                         <Button
                           size='sm'
                           variant='outline'
-                          onClick={() => {}}
+                          onClick={() =>
+                            handleDeleteSupplier(parseInt(supplier?.id))
+                          }
                           className='text-red-700 transition-colors border-red-200 hover:bg-red-50 hover:text-red-800'
                         >
                           <Trash2 className='w-4 h-4 mr-1' />
@@ -179,6 +195,11 @@ export const SuppliersTable = () => {
         open={openCreateModal}
         onOpenChange={handleOpenChange}
         proveedorId={actualUserId ?? null}
+      />
+      <DeleteSupplierModal
+        supplierId={actualUserId ?? null}
+        isOpen={openDeleteModal}
+        onOpenChange={setOpenDeleteModal}
       />
     </div>
   )

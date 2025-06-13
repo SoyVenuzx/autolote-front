@@ -1,8 +1,11 @@
 import type { StateCreator } from 'zustand'
-import type { ClienteSliceType } from '../types/client.type'
+import type { Cliente, ClienteSliceType } from '../types/client.type'
 import { api } from '@/api/axios'
 import toast from 'react-hot-toast'
-import type { CreateClientType } from '@/schemas/createClient.schema'
+import type {
+  CreateClientType,
+  UpdateClientType
+} from '@/schemas/createClient.schema'
 
 export const createClienteSlice: StateCreator<ClienteSliceType> = (set, _) => {
   return {
@@ -42,6 +45,30 @@ export const createClienteSlice: StateCreator<ClienteSliceType> = (set, _) => {
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message || 'Error al registrarse'
+
+        toast.error(errorMessage)
+
+        set({
+          isLoadingClient: false,
+          errorClient: errorMessage
+        })
+
+        throw error
+      }
+    },
+    updateClient: async (id: number, formData: UpdateClientType) => {
+      set({ isLoadingClient: true, errorClient: null })
+      try {
+        const { data } = await api.put<{ message: string; data: Cliente[] }>(
+          `/client/${id}`,
+          formData
+        )
+
+        set({ isLoadingClient: false, clients: data?.data })
+        toast.success('Cliente actualizado exitosamente')
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.message || 'Error al actualizar cliente'
 
         toast.error(errorMessage)
 
